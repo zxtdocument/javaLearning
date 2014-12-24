@@ -1,0 +1,311 @@
+　Java 内部类种类及使用解析
+内部类Inner Class
+　　将相关的类组织在一起，从而降低了命名空间的混乱。
+
+　　一个内部类可以定义在另一个类里，可以定义在函数里，甚至可以作为一个表达式的一部分。
+
+　　Java中的内部类共分为四种：
+
+　　静态内部类static inner class (also called nested class)
+
+　　成员内部类member inner class
+
+　　局部内部类local inner class
+
+　　匿名内部类anonymous inner class
+
+ 
+静态内部类Static Inner Class
+　　最简单的内部类形式。
+
+　　类定义时加上static关键字。
+
+　　不能和外部类有相同的名字。
+
+　　被编译成一个完全独立的.class文件，名称为OuterClass$InnerClass.class的形式。
+
+　　只可以访问外部类的静态成员和静态方法，包括了私有的静态成员和方法。
+
+　　生成静态内部类对象的方式为：
+
+　　OuterClass.InnerClass inner = new OuterClass.InnerClass();
+
+　　静态内部类使用代码：
+
+
+复制代码
+package com.learnjava.innerclass;
+
+class StaticInner
+{
+    private static int a = 4;
+
+    // 静态内部类
+    public static class Inner
+    {
+        public void test()
+        {
+            // 静态内部类可以访问外部类的静态成员
+            // 并且它只能访问静态的
+            System.out.println(a);
+        }
+
+    }
+}
+
+public class StaticInnerClassTest
+{
+
+    public static void main(String[] args)
+    {
+        StaticInner.Inner inner = new StaticInner.Inner();
+        inner.test();
+    }
+}
+复制代码
+ 
+
+成员内部类Member Inner Class
+　　成员内部类也是定义在另一个类中，但是定义时不用static修饰。
+
+　　成员内部类和静态内部类可以类比为非静态的成员变量和静态的成员变量。
+
+　　成员内部类就像一个实例变量。
+
+　　它可以访问它的外部类的所有成员变量和方法，不管是静态的还是非静态的都可以。
+
+　　在外部类里面创建成员内部类的实例：
+
+　　this.new Innerclass();
+
+　　在外部类之外创建内部类的实例：
+
+　　(new Outerclass()).new Innerclass();
+
+　　在内部类里访问外部类的成员：
+
+　　Outerclass.this.member
+
+　　详情见代码例子：
+
+
+复制代码
+package com.learnjava.innerclass;
+
+class MemberInner
+{
+    private int d = 1;
+    private int a = 2;
+
+    // 定义一个成员内部类
+    public class Inner2
+    {
+        private int a = 8;
+
+        public void doSomething()
+        {
+            // 直接访问外部类对象
+            System.out.println(d);
+            System.out.println(a);// 直接访问a，则访问的是内部类里的a
+
+            // 如何访问到外部类里的a呢？
+            System.out.println(MemberInner.this.a);
+        }
+
+    }
+
+}
+
+public class MemberInnerClassTest
+{
+
+    public static void main(String[] args)
+    {
+
+        // 创建成员内部类的对象
+        // 需要先创建外部类的实例
+        MemberInner.Inner2 inner = new MemberInner().new Inner2();
+
+        inner.doSomething();
+    }
+}
+复制代码
+ 
+
+局部内部类Local Inner Class
+　　局部内部类定义在方法中，比方法的范围还小。是内部类中最少用到的一种类型。
+
+　　像局部变量一样，不能被public, protected, private和static修饰。
+
+　　只能访问方法中定义的final类型的局部变量。
+
+　　局部内部类在方法中定义，所以只能在方法中使用，即只能在方法当中生成局部内部类的实例并且调用其方法。
+
+
+复制代码
+package com.learnjava.innerclass;
+
+class LocalInner
+{
+    int a = 1;
+
+    public void doSomething()
+    {
+        int b = 2;
+        final int c = 3;
+        // 定义一个局部内部类
+        class Inner3
+        {
+            public void test()
+            {
+                System.out.println("Hello World");
+                System.out.println(a);
+
+                // 不可以访问非final的局部变量
+                // error: Cannot refer to a non-final variable b inside an inner
+                // class defined in a different method
+                // System.out.println(b);
+
+                // 可以访问final变量
+                System.out.println(c);
+            }
+        }
+
+        // 创建局部内部类的实例并调用方法
+        new Inner3().test();
+    }
+}
+
+public class LocalInnerClassTest
+{
+    public static void main(String[] args)
+    {
+        // 创建外部类对象
+        LocalInner inner = new LocalInner();
+        // 调用外部类的方法
+        inner.doSomething();
+    }
+
+}
+复制代码
+ 
+
+匿名内部类Anonymous Inner Class
+　　匿名内部类就是没有名字的局部内部类，不使用关键字class, extends, implements, 没有构造方法。
+
+　　匿名内部类隐式地继承了一个父类或者实现了一个接口。
+
+　　匿名内部类使用得比较多，通常是作为一个方法参数。
+
+
+复制代码
+package com.learnjava.innerclass;
+
+import java.util.Date;
+
+public class AnonymouseInnerClass
+{
+
+    @SuppressWarnings("deprecation")
+    public String getDate(Date date)
+    {
+        return date.toLocaleString();
+
+    }
+
+    public static void main(String[] args)
+    {
+        AnonymouseInnerClass test = new AnonymouseInnerClass();
+
+        // 打印日期：
+        String str = test.getDate(new Date());
+        System.out.println(str);
+        System.out.println("----------------");
+
+        // 使用匿名内部类
+        String str2 = test.getDate(new Date()
+        {
+        });// 使用了花括号，但是不填入内容，执行结果和上面的完全一致
+            // 生成了一个继承了Date类的子类的对象
+        System.out.println(str2);
+        System.out.println("----------------");
+
+        // 使用匿名内部类，并且重写父类中的方法
+        String str3 = test.getDate(new Date()
+        {
+
+            // 重写父类中的方法
+            @Override
+            @Deprecated
+            public String toLocaleString()
+            {
+                return "Hello: " + super.toLocaleString();
+            }
+
+        });
+
+        System.out.println(str3);
+    }
+}
+复制代码
+ 
+
+　　生成的.class文件中，匿名类会生成OuterClass$1.class文件，数字根据是第几个匿名类而类推。
+
+　　Swing中使用内部类的例子如下：
+
+
+复制代码
+package com.learnjava.innerclass;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+public class SwingTest
+{
+    public static void main(String[] args)
+    {
+        JFrame frame = new JFrame("JFrame");
+        JButton button = new JButton("JButton");
+
+        button.addActionListener(new ActionListener()
+        {
+            // new出来一个实现了ActionListener接口的类的实例
+
+            @Override
+            public void actionPerformed(ActionEvent arg0)
+            {
+                System.out.println("Hello World");
+
+            }
+        });
+
+        //加入按钮
+        frame.getContentPane().add(button);
+
+        //设置关闭行为
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.setSize(200, 200);
+        
+        frame.addWindowListener(new WindowAdapter()
+        {
+            //也可以使用继承了适配器类的匿名内部类
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+            
+                System.out.println("Closing");
+                System.exit(0);
+            }
+        });
+        frame.setVisible(true);
+    }
+
+}
+复制代码
